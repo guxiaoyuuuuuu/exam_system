@@ -1,52 +1,66 @@
 package org.jeecg.modules.exam.entity;
 
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.util.Date;
-import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.jeecgframework.poi.excel.annotation.Excel;
-import org.jeecg.common.aspect.annotation.Dict;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.jeecgframework.poi.excel.annotation.Excel;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
- * @Description: 学生成绩表
+ * @Description: 考试安排表
  * @Author: jeecg-boot
- * @Date:   2020-04-18
+ * @Date:   2020-04-15
  * @Version: V1.0
  */
 @Data
-@TableName("student_score")
+@TableName("exam_arrange")
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value="student_score对象", description="学生成绩表")
-public class StudentScore implements Serializable {
+@ApiModel(value="exam_arrange对象", description="考试安排表")
+public class ExamArrangeVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
 	/**主键*/
 	@TableId(type = IdType.ID_WORKER_STR)
     @ApiModelProperty(value = "主键")
     private String id;
-	/**学号*/
-	@Excel(name = "学号", width = 15)
-    @ApiModelProperty(value = "学号")
-    private String studentNo;
 	/**科目编号*/
 	@Excel(name = "科目编号", width = 15)
     @ApiModelProperty(value = "科目编号")
     private String courseNo;
-	/**成绩*/
-	@Excel(name = "成绩", width = 15)
-    @ApiModelProperty(value = "成绩")
-    private BigDecimal score;
+    /**科目名称*/
+    @Excel(name = "科目名称", width = 15)
+    @ApiModelProperty(value = "科目名称")
+    private String courseName;
+	/**教室考场号*/
+	@Excel(name = "教室考场号", width = 15)
+    @ApiModelProperty(value = "教室考场号")
+    private String examNo;
+    /**教室名称*/
+    @Excel(name = "教室名称", width = 15)
+    @ApiModelProperty(value = "教室名称")
+    private String name;
+	/**考试批次号*/
+	@Excel(name = "考试批次号", width = 15)
+    @ApiModelProperty(value = "考试批次号")
+    private String batchNo;
+	/**教师编号*/
+	@Excel(name = "教师编号", width = 15)
+    @ApiModelProperty(value = "教师编号")
+    private String teacherNo;
+    /**教师名称*/
+    @Excel(name = "教师名称", width = 15)
+    @ApiModelProperty(value = "教师名称")
+    private String realname;
 	/**创建人*/
 	@Excel(name = "创建人", width = 15)
     @ApiModelProperty(value = "创建人")

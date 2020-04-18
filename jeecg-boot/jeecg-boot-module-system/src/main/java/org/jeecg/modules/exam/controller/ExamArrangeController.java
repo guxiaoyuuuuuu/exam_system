@@ -1,5 +1,7 @@
 package org.jeecg.modules.exam.controller;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -9,10 +11,18 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import org.apache.commons.beanutils.BeanUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.exam.entity.Classroom;
+import org.jeecg.modules.exam.entity.Course;
 import org.jeecg.modules.exam.entity.ExamArrange;
+import org.jeecg.modules.exam.entity.ExamArrangeVO;
+import org.jeecg.modules.exam.mapper.ClassroomMapper;
+import org.jeecg.modules.exam.mapper.CourseMapper;
 import org.jeecg.modules.exam.service.IExamArrangeService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -20,6 +30,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.mapper.SysUserMapper;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -47,9 +59,14 @@ import org.jeecg.common.aspect.annotation.AutoLog;
 @RequestMapping("/exam/examArrange")
 @Slf4j
 public class ExamArrangeController extends JeecgController<ExamArrange, IExamArrangeService> {
-	@Autowired
-	private IExamArrangeService examArrangeService;
-	
+	 @Autowired
+	 private IExamArrangeService examArrangeService;
+	 @Autowired
+	 private ClassroomMapper classroomMapper;
+	 @Autowired
+	 private CourseMapper courseMapper;
+	 @Autowired
+	 private SysUserMapper sysUserMapper;
 	/**
 	 * 分页列表查询
 	 *
@@ -65,10 +82,73 @@ public class ExamArrangeController extends JeecgController<ExamArrange, IExamArr
 	public Result<?> queryPageList(ExamArrange examArrange,
 								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
-								   HttpServletRequest req) {
+								   HttpServletRequest req) throws InvocationTargetException, IllegalAccessException {
 		QueryWrapper<ExamArrange> queryWrapper = QueryGenerator.initQueryWrapper(examArrange, req.getParameterMap());
 		Page<ExamArrange> page = new Page<ExamArrange>(pageNo, pageSize);
 		IPage<ExamArrange> pageList = examArrangeService.page(page, queryWrapper);
+		IPage<ExamArrangeVO> pageList2 = new IPage<ExamArrangeVO>() {
+			@Override
+			public List<OrderItem> orders() {
+				return null;
+			}
+
+			@Override
+			public List<ExamArrangeVO> getRecords() {
+				return null;
+			}
+
+			@Override
+			public IPage<ExamArrangeVO> setRecords(List<ExamArrangeVO> records) {
+				return null;
+			}
+
+			@Override
+			public long getTotal() {
+				return 0;
+			}
+
+			@Override
+			public IPage<ExamArrangeVO> setTotal(long total) {
+				return null;
+			}
+
+			@Override
+			public long getSize() {
+				return 0;
+			}
+
+			@Override
+			public IPage<ExamArrangeVO> setSize(long size) {
+				return null;
+			}
+
+			@Override
+			public long getCurrent() {
+				return 0;
+			}
+
+			@Override
+			public IPage<ExamArrangeVO> setCurrent(long current) {
+				return null;
+			}
+		};
+		BeanUtils.copyProperties(pageList,pageList2);
+		List<ExamArrangeVO> ExamArrangeVOList = new ArrayList<ExamArrangeVO>();
+		for(ExamArrange examArrangePage : pageList.getRecords()){
+			ExamArrangeVO examArrangeVO = new ExamArrangeVO();
+			Classroom classroom = classroomMapper.selectOne(new QueryWrapper<Classroom>().eq("exam_no",examArrangePage.getExamNo()));
+			examArrangeVO.setName(classroom.getName());
+			Course course =courseMapper.selectOne(new QueryWrapper<Course>().eq("course_no",examArrangePage.getCourseNo()));
+			examArrangeVO.setCourseName(course.getCourseName());
+			SysUser sysUser = sysUserMapper.selectOne(new QueryWrapper<SysUser>().eq("work_no",examArrangePage.getTeacherNo()));
+			examArrangeVO.setRealname(sysUser.getRealname());
+			BeanUtils.copyProperties(examArrangePage,examArrangeVO);
+			examArrangeVO.setId(examArrangePage.getId());
+			ExamArrangeVOList.add(examArrangeVO);
+		}
+		log.info("{}",ExamArrangeVOList);
+		pageList2.setRecords(ExamArrangeVOList);
+		log.info("{}",pageList2.getRecords());
 		return Result.ok(pageList);
 	}
 	

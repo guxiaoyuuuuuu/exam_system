@@ -177,4 +177,7 @@ public class PasswordUtil {
 	}
 
 
+	public static void main(String[] args){
+		System.out.println(encrypt("zhangwei", "123456",  "RCGTeGiH"));
+	}
 }

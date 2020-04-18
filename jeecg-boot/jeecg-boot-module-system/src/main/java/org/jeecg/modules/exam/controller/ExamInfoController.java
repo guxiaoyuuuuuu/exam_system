@@ -9,6 +9,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
@@ -81,6 +83,7 @@ public class ExamInfoController extends JeecgController<ExamInfo, IExamInfoServi
 	@AutoLog(value = "考试须知表-添加")
 	@ApiOperation(value="考试须知表-添加", notes="考试须知表-添加")
 	@PostMapping(value = "/add")
+	@RequiresPermissions("examinfo:add")
 	public Result<?> add(@RequestBody ExamInfo examInfo) {
 		examInfoService.save(examInfo);
 		return Result.ok("添加成功！");
@@ -95,6 +98,7 @@ public class ExamInfoController extends JeecgController<ExamInfo, IExamInfoServi
 	@AutoLog(value = "考试须知表-编辑")
 	@ApiOperation(value="考试须知表-编辑", notes="考试须知表-编辑")
 	@PutMapping(value = "/edit")
+	@RequiresPermissions("examinfo:edit")
 	public Result<?> edit(@RequestBody ExamInfo examInfo) {
 		examInfoService.updateById(examInfo);
 		return Result.ok("编辑成功!");
@@ -109,6 +113,7 @@ public class ExamInfoController extends JeecgController<ExamInfo, IExamInfoServi
 	@AutoLog(value = "考试须知表-通过id删除")
 	@ApiOperation(value="考试须知表-通过id删除", notes="考试须知表-通过id删除")
 	@DeleteMapping(value = "/delete")
+	@RequiresPermissions("examinfo:delete")
 	public Result<?> delete(@RequestParam(name="id",required=true) String id) {
 		examInfoService.removeById(id);
 		return Result.ok("删除成功!");
